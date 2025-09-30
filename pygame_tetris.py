@@ -2,6 +2,7 @@ import pygame
 from tetris import *
 
 class TetrisPygame:
+    """A pygame based renderer for a tetris game."""
     def __init__(self, rows=20, cols=10, cell_size=30):
         pygame.init()
         self.cell_size = cell_size
@@ -71,7 +72,3 @@ class TetrisPygame:
 if __name__ == "__main__":
     game = TetrisPygame()
     game.run()
-
-
-
-
