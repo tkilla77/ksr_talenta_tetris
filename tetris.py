@@ -6,6 +6,9 @@ class Cell(Enum):
     RED = 2
     BLUE = 3
     GREEN = 4
+    MAGENTA = 5
+    YELLOW = 6
+    CYAN = 7
 
 class Piece:
     def __init__(self, coords, color):
@@ -35,6 +38,16 @@ class Piece:
         for c in self.coords:
             c[0] -= minx
             c[1] -= miny
+
+pieces = [
+    Piece([[0, 0], [1, 0], [1, 1], [2, 0]], Cell.GREEN),
+    Piece([[0, 0], [0, 1], [0, 2], [0, 3]], Cell.RED),
+    Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Cell.BLUE),
+    Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Cell.YELLOW),
+    Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Cell.MAGENTA),
+]
+def random_piece():
+    return random.choice(pieces)
 
 
 class Tetris:
@@ -88,8 +101,10 @@ class Tetris:
         if not self.current:
             # Create new piece
             # TODO random shape
-            self.current = Piece([[0, 0], [1, 0], [1, 1], [2, 0]], random.choice([Cell.RED, Cell.BLUE, Cell.GREEN]))
+            self.current = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
+            if self.is_blocked():
+                raise Error("ended")
         elif self.is_blocked():
             self.anchor_piece()
             self.clear_full_rows()
