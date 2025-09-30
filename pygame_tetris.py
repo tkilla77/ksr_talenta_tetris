@@ -13,7 +13,7 @@ class TetrisPygame:
         self.tetris = Tetris(rows, cols)
     
     def color(self, cell):
-        return pygame.Color(cell.name.lower()) if cell != Cell.EMPTY else pygame.Color('black')
+        return pygame.Color(cell.name.lower()) if cell != Color.EMPTY else pygame.Color('black')
 
     def draw_grid(self):
         for r in range(self.tetris.rows):

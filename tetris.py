@@ -1,7 +1,7 @@
 from enum import Enum
 import random
 
-class Cell(Enum):
+class Color(Enum):
     EMPTY = 1
     RED = 2
     BLUE = 3
@@ -40,11 +40,11 @@ class Piece:
             c[1] -= miny
 
 pieces = [
-    Piece([[0, 0], [1, 0], [1, 1], [2, 0]], Cell.GREEN),
-    Piece([[0, 0], [0, 1], [0, 2], [0, 3]], Cell.RED),
-    Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Cell.BLUE),
-    Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Cell.YELLOW),
-    Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Cell.MAGENTA),
+    Piece([[0, 0], [1, 0], [1, 1], [2, 0]], Color.GREEN),
+    Piece([[0, 0], [0, 1], [0, 2], [0, 3]], Color.RED),
+    Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Color.BLUE),
+    Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Color.YELLOW),
+    Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Color.MAGENTA),
 ]
 def random_piece():
     return random.choice(pieces)
@@ -54,7 +54,7 @@ class Tetris:
     def __init__(self, rows=20, cols=10):
         self.rows = rows
         self.cols = cols
-        self.grid = [[Cell.EMPTY] * cols for _ in range(rows)]
+        self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.level = 1
         self.speed = 1.0
         self.current = None
@@ -122,15 +122,15 @@ class Tetris:
             for r, c in self.current_coords():
                 if r+1 >= self.rows:
                     return True
-                if self.grid[r][c] != Cell.EMPTY:
+                if self.grid[r][c] != Color.EMPTY:
                     return True
-                if self.grid[r+1][c] != Cell.EMPTY:
+                if self.grid[r+1][c] != Color.EMPTY:
                     return True
         return False
         
     def is_full_row(self, row):
         for cell in row:
-            if cell == Cell.EMPTY:
+            if cell == Color.EMPTY:
                 return False
         return True
 
@@ -138,7 +138,7 @@ class Tetris:
         for index, row in enumerate(self.grid):
             if self.is_full_row(row):
                 self.grid.pop(index)
-                self.grid.insert(0, [Cell.EMPTY] * self.cols)
+                self.grid.insert(0, [Color.EMPTY] * self.cols)
                 return True
         return False
     
