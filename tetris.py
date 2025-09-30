@@ -11,17 +11,20 @@ class Color(Enum):
     CYAN = 7
 
 class Piece:
+    """A tetris piece with shape and color."""
     def __init__(self, coords, color):
         self.coords = coords
         self.color = color
 
     def width(self):
+        """Returns the width of the piece in cells."""
         result = 0
         for c in self.coords:
             result = max(result, c[1] + 1)
         return result
 
     def height(self):
+        """Returns the height of the piece in cells."""
         result = 0
         for c in self.coords:
             result = max(result, c[0] + 1)
@@ -47,17 +50,21 @@ pieces = [
     Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Color.MAGENTA),
 ]
 def random_piece():
+    """Returns a random piece."""
     return random.choice(pieces)
 
 
 class Tetris:
+    """An abstract game of Tetris."""
     def __init__(self, rows=20, cols=10):
         self.rows = rows
         self.cols = cols
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.level = 1
         self.speed = 1.0
+        """The currently active piece being dropped."""
         self.current = None
+        """The upper-left coordinate [row, col] of the current piece being dropped."""
         self.current_pos = None
     
     def rotate(self):
@@ -70,23 +77,27 @@ class Tetris:
                 self.current_pos[1] += shift
     
     def left(self):
+        """Shift the current piece to the left, if possible."""
         if self.current_pos:
             self.current_pos[1] = max(0, self.current_pos[1] - 1)
             if self.is_blocked():
                 self.current_pos[1] += 1
 
     def right(self):
+        """Shift the current piece to the right, if possible."""
         if self.current:
             self.current_pos[1] = min(self.cols - self.current.width(), self.current_pos[1] + 1)
             if self.is_blocked():
                 self.current_pos[1] -= 1
 
     def down(self):
+        """Shift the current piece down as far as possible."""
         if self.current:
             while not self.is_blocked():
                 self.current_pos[0] += 1
     
     def current_coords(self):
+        """Returns the coordinates [row, col] of all cells occupied by the current piece."""
         result = []
         if not self.current:
             return result
@@ -96,19 +107,21 @@ class Tetris:
             result.append([r, c])
         return result
 
-    
     def step(self):
+        """Modifies the state of the tetris game by dropping the current piece by one, or 
+           spawning a fresh piece."""
         if not self.current:
-            # Create new piece
-            # TODO random shape
+            # Spawn a new piece
             self.current = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
             if self.is_blocked():
                 raise Error("ended")
         elif self.is_blocked():
+            # Anchor the current piece and clear rows.
             self.anchor_piece()
             self.clear_full_rows()
         else:
+            # Lower current piece by one.
             self.current_pos[0] += 1
     
     def anchor_piece(self):
@@ -121,11 +134,11 @@ class Tetris:
         if self.current:
             for r, c in self.current_coords():
                 if r+1 >= self.rows:
-                    return True
+                    return True  # Cell has reached bottom
                 if self.grid[r][c] != Color.EMPTY:
-                    return True
+                    return True  # Cell overlaps with an existing block.
                 if self.grid[r+1][c] != Color.EMPTY:
-                    return True
+                    return True  # Cell stands on a non-empty block.
         return False
         
     def is_full_row(self, row):
