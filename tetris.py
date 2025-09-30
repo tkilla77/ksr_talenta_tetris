@@ -59,10 +59,14 @@ class Tetris:
     def left(self):
         if self.current_pos:
             self.current_pos[1] = max(0, self.current_pos[1] - 1)
+            if self.is_blocked():
+                self.current_pos[1] += 1
 
     def right(self):
         if self.current:
             self.current_pos[1] = min(self.cols - self.current.width(), self.current_pos[1] + 1)
+            if self.is_blocked():
+                self.current_pos[1] -= 1
 
     def down(self):
         if self.current:
@@ -101,7 +105,9 @@ class Tetris:
     def is_blocked(self):
         if self.current:
             for r, c in self.current_coords():
-                if r+1 == self.rows:
+                if r+1 >= self.rows:
+                    return True
+                if self.grid[r][c] != Cell.EMPTY:
                     return True
                 if self.grid[r+1][c] != Cell.EMPTY:
                     return True
