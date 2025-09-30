@@ -61,7 +61,7 @@ class Tetris:
         self.cols = cols
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.level = 1
-        self.speed = 1.0
+        self.speed = 1.0  # Game frames per second
         """The currently active piece being dropped."""
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
@@ -125,12 +125,14 @@ class Tetris:
             self.current_pos[0] += 1
     
     def anchor_piece(self):
+        """Anchors the current piece in place by fixing the cells, and clears the current piece."""
         for r, c in self.current_coords():
             self.grid[r][c] = self.current.color
         self.current = None
         self.current_pos = None
 
     def is_blocked(self):
+        """Returns True if the current piece cannot move downwards."""
         if self.current:
             for r, c in self.current_coords():
                 if r+1 >= self.rows:
@@ -142,19 +144,23 @@ class Tetris:
         return False
         
     def is_full_row(self, row):
+        """Returns True if a row is full, False otherwise."""
         for cell in row:
             if cell == Color.EMPTY:
                 return False
         return True
 
     def clear_full_row(self):
+        """Clear a single full row or return False if no rows can be cleared."""
         for index, row in enumerate(self.grid):
             if self.is_full_row(row):
                 self.grid.pop(index)
                 self.grid.insert(0, [Color.EMPTY] * self.cols)
+                self.speed *= 1.5  # increase speed by 50% for each row...
                 return True
         return False
     
     def clear_full_rows(self):
+        """Clear all complete rows."""
         while self.clear_full_row():
             pass

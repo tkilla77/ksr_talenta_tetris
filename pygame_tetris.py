@@ -48,7 +48,7 @@ class TetrisPygame:
     def run(self):
         running = True
         while running:
-            self.clock.tick(3)
+            self.clock.tick(self.tetris.speed)
             self.tetris.step()
 
             for event in pygame.event.get():
