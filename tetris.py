@@ -43,16 +43,15 @@ class Piece:
             c[1] -= miny
 
 pieces = [
-    Piece([[0, 0], [1, 0], [1, 1], [2, 0]], Color.GREEN),
-    Piece([[0, 0], [0, 1], [0, 2], [0, 3]], Color.RED),
-    Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Color.BLUE),
-    Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Color.YELLOW),
-    Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Color.MAGENTA),
+    Piece([[0, 0], [1, 0], [1, 1], [2, 0]], Color.GREEN),  # T
+    Piece([[0, 0], [0, 1], [0, 2], [0, 3]], Color.RED),    # I
+    Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Color.BLUE),   # L
+    Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Color.YELLOW), # inversed L
+    Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Color.MAGENTA),# square
 ]
 def random_piece():
     """Returns a random piece."""
     return random.choice(pieces)
-
 
 class Tetris:
     """An abstract game of Tetris."""
@@ -136,11 +135,11 @@ class Tetris:
         if self.current:
             for r, c in self.current_coords():
                 if r+1 >= self.rows:
-                    return True  # Cell has reached bottom
+                    return True  # piece has reached bottom
                 if self.grid[r][c] != Color.EMPTY:
-                    return True  # Cell overlaps with an existing block.
+                    return True  # piece overlaps with an existing block.
                 if self.grid[r+1][c] != Color.EMPTY:
-                    return True  # Cell stands on a non-empty block.
+                    return True  # piece stands on a non-empty block.
         return False
         
     def is_full_row(self, row):
