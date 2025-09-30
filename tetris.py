@@ -61,7 +61,7 @@ class Tetris:
         self.cols = cols
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.level = 1
-        self.speed = 1.0  # Game frames per second
+        self.speed = 1.5  # Game frames per second
         """The currently active piece being dropped."""
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
@@ -156,7 +156,7 @@ class Tetris:
             if self.is_full_row(row):
                 self.grid.pop(index)
                 self.grid.insert(0, [Color.EMPTY] * self.cols)
-                self.speed *= 1.5  # increase speed by 50% for each row...
+                self.speed *= 1.3  # increase speed by 30% for each row...
                 return True
         return False
     
