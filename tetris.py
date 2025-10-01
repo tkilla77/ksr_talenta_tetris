@@ -117,7 +117,7 @@ class Tetris:
             # Spawn a new piece
             self.current = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
-            if self.is_blocked():
+            if self.is_impossible():
                 raise Exception(f"ended with highscore {self.score}")
         elif self.is_blocked():
             # Anchor the current piece and clear rows.
@@ -125,6 +125,8 @@ class Tetris:
             self.clear_full_rows()
         else:
             # Lower current piece by one.
+            if self.is_blocked():
+                raise Exception(f"ended with highscore {self.score}")
             self.current_pos[0] += 1
     
     def anchor_piece(self):
