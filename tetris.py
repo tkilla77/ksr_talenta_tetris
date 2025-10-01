@@ -125,8 +125,6 @@ class Tetris:
             self.clear_full_rows()
         else:
             # Lower current piece by one.
-            if self.is_blocked():
-                raise Exception(f"ended with highscore {self.score}")
             self.current_pos[0] += 1
     
     def anchor_piece(self):
