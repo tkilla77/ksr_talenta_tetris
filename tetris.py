@@ -55,12 +55,12 @@ def random_piece():
 
 class Tetris:
     """An abstract game of Tetris."""
-    def __init__(self, rows=20, cols=10):
+    def __init__(self, rows=20, cols=10, speed=1.5, speedup=1.1):
         self.rows = rows
         self.cols = cols
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
-        self.level = 1
-        self.speed = 1.5  # Game steps per second
+        self.speed = speed  # Game steps per second
+        self.speedup = speedup
         """The currently active piece being dropped."""
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
@@ -114,7 +114,7 @@ class Tetris:
             self.current = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
             if self.is_blocked():
-                raise Error("ended")
+                raise Exception("ended")
         elif self.is_blocked():
             # Anchor the current piece and clear rows.
             self.anchor_piece()
@@ -155,7 +155,7 @@ class Tetris:
             if self.is_full_row(row):
                 self.grid.pop(index)
                 self.grid.insert(0, [Color.EMPTY] * self.cols)
-                self.speed *= 1.3  # increase speed by 30% for each row...
+                self.speed *= self.speedup
                 return True
         return False
     
