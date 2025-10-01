@@ -9,6 +9,7 @@ class Color(Enum):
     MAGENTA = 5
     YELLOW = 6
     CYAN = 7
+    PINK = 8
 
 class Piece:
     """A tetris piece with shape and color."""
@@ -48,6 +49,7 @@ pieces = [
     Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Color.BLUE),   # L
     Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Color.YELLOW), # inversed L
     Piece([[0, 0], [0, 1], [1, 1], [1, 2]], Color.CYAN),  # S
+    Piece([[1, 0], [1, 1], [0, 1], [0, 2]], Color.PINK),  # 2
     Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Color.MAGENTA),# square
 ]
 def random_piece():
