@@ -61,6 +61,7 @@ class Tetris:
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.speed = speed  # Game steps per second
         self.speedup = speedup
+        self.score = 0
         """The currently active piece being dropped."""
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
@@ -114,7 +115,7 @@ class Tetris:
             self.current = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
             if self.is_blocked():
-                raise Exception("ended")
+                raise Exception(f"ended with highscore {self.score}")
         elif self.is_blocked():
             # Anchor the current piece and clear rows.
             self.anchor_piece()
@@ -161,5 +162,10 @@ class Tetris:
     
     def clear_full_rows(self):
         """Clear all complete rows."""
+        row_score = 0
         while self.clear_full_row():
-            pass
+            # Clearing multiple rows increases the jackpot...
+            row_score = row_score * 2 + self.cols
+        if row_score:
+            self.score += row_score
+            print(f'+{row_score} => {self.score}')
