@@ -54,8 +54,9 @@ pieces = [
 ]
 def random_piece():
     """Returns a random piece."""
-    return random.choice(pieces)
-
+    # return random.choice(pieces)
+    return pieces[1]
+    
 class Tetris:
     """An abstract game of Tetris."""
     def __init__(self, rows=20, cols=10, speed=1.5, speedup=1.1):
@@ -74,6 +75,7 @@ class Tetris:
         """Rotate the current piece in CCW direction."""
         if self.current:
             self.current.rotate()
+            # TODO block rotation if the result is illegal
             # Ensure piece stays within grid
             shift = self.cols - (self.current_pos[1] + self.current.width())
             if shift < 0:
