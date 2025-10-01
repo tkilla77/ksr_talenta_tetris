@@ -35,9 +35,12 @@ class TetrisPygame:
 
     def run(self):
         running = True
+        step_time = 0
         while running:
-            dt = self.clock.tick(self.tetris.speed)
-            self.tetris.step()
+            step_time += self.clock.tick(40)
+            if step_time > 1000 / self.tetris.speed:
+                self.tetris.step()
+                step_time = 0
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

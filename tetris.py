@@ -60,7 +60,7 @@ class Tetris:
         self.cols = cols
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.level = 1
-        self.speed = 1.5  # Game frames per second
+        self.speed = 1.5  # Game steps per second
         """The currently active piece being dropped."""
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
