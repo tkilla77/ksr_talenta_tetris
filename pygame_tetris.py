@@ -3,52 +3,40 @@ from tetris import *
 
 class TetrisPygame:
     """A pygame based renderer for a tetris game."""
-    def __init__(self, rows=20, cols=10, cell_size=30):
+    def __init__(self, tetris, cell_size=30):
         pygame.init()
         self.cell_size = cell_size
-        self.width = cols * cell_size
-        self.height = rows * cell_size
+        self.tetris = tetris
+        self.width = tetris.cols * cell_size
+        self.height = tetris.rows * cell_size
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tetris")
         self.clock = pygame.time.Clock()
-        self.tetris = Tetris(rows, cols)
     
     def color(self, cell):
         return pygame.Color(cell.name.lower()) if cell != Color.EMPTY else pygame.Color('black')
+    
+    def cell2rect(self, row, col):
+        return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
 
     def draw_grid(self):
         for r in range(self.tetris.rows):
             for c in range(self.tetris.cols):
                 cell = self.tetris.grid[r][c]
                 color = self.color(cell)
-                pygame.draw.rect(
-                    self.screen,
-                    color,
-                    (c * self.cell_size, r * self.cell_size, self.cell_size, self.cell_size),
-                    0
-                )
-                pygame.draw.rect(
-                    self.screen,
-                    pygame.Color('grey'),
-                    (c * self.cell_size, r * self.cell_size, self.cell_size, self.cell_size),
-                    1
-                )
+                pygame.draw.rect(self.screen, color, self.cell2rect(r, c))
+                pygame.draw.rect(self.screen, pygame.Color('grey'), self.cell2rect(r, c), 1)
 
     def draw_piece(self):
         if self.tetris.current:
             for r, c in self.tetris.current_coords():
                 color = self.color(self.tetris.current.color)
-                pygame.draw.rect(
-                    self.screen,
-                    color,
-                    (c * self.cell_size, r * self.cell_size, self.cell_size, self.cell_size),
-                    0
-                )
+                pygame.draw.rect(self.screen, color, self.cell2rect(r, c))
 
     def run(self):
         running = True
         while running:
-            self.clock.tick(self.tetris.speed)
+            dt = self.clock.tick(self.tetris.speed)
             self.tetris.step()
 
             for event in pygame.event.get():
@@ -70,5 +58,6 @@ class TetrisPygame:
         pygame.quit()
 
 if __name__ == "__main__":
-    game = TetrisPygame()
+    tetris = Tetris(20, 10)
+    game = TetrisPygame(tetris)
     game.run()
