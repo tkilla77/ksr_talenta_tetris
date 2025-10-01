@@ -47,6 +47,7 @@ pieces = [
     Piece([[0, 0], [0, 1], [0, 2], [0, 3]], Color.RED),    # I
     Piece([[0, 0], [0, 1], [0, 2], [1, 2]], Color.BLUE),   # L
     Piece([[0, 0], [0, 1], [0, 2], [1, 0]], Color.YELLOW), # inversed L
+    Piece([[0, 0], [0, 1], [1, 1], [1, 2]], Color.CYAN),  # S
     Piece([[0, 0], [0, 1], [1, 0], [1, 1]], Color.MAGENTA),# square
 ]
 def random_piece():
@@ -150,6 +151,13 @@ class Tetris:
                 return False
         return True
 
+    def is_cleared(self):
+        """Returns True if a row is full, False otherwise."""
+        for cell in self.grid[-1]:
+            if cell != Color.EMPTY:
+                return False
+        return True
+
     def clear_full_row(self):
         """Clear a single full row or return False if no rows can be cleared."""
         for index, row in enumerate(self.grid):
@@ -167,5 +175,7 @@ class Tetris:
             # Clearing multiple rows increases the jackpot...
             row_score = row_score * 2 + self.cols
         if row_score:
+            if self.is_cleared():
+                row_score += 100
             self.score += row_score
             print(f'+{row_score} => {self.score}')
