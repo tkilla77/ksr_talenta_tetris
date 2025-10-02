@@ -55,8 +55,9 @@ pieces = [
 ]
 def random_piece():
     """Returns a random piece."""
-    return random.choice(pieces)
-    # return pieces[1]  # for testing
+    import copy
+    return copy.deepcopy(random.choice(pieces))
+    # return copy.deepcopy(pieces[1])  # for testing
     
 class Tetris:
     """An abstract game of Tetris."""
