@@ -54,8 +54,8 @@ pieces = [
 ]
 def random_piece():
     """Returns a random piece."""
-    # return random.choice(pieces)
-    return pieces[1]
+    return random.choice(pieces)
+    # return pieces[1]  # for testing
     
 class Tetris:
     """An abstract game of Tetris."""
