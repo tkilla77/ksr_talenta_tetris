@@ -31,17 +31,18 @@ class Piece:
             result = max(result, c[0] + 1)
         return result
 
-    def rotate(self):
+    def rotate(self, turns=1):
         """Rotate CCW and ensure 0,0 is the upper left corner."""
         # Rotation matrix is [[0, -1], [1, 0]]
-        minx, miny = 0, 0
-        for c in self.coords:
-            c[0], c[1] = -c[1], c[0]
-            minx = min(minx, c[0])
-            miny = min(miny, c[1])
-        for c in self.coords:
-            c[0] -= minx
-            c[1] -= miny
+        for _ in range(turns):
+            minx, miny = 0, 0
+            for c in self.coords:
+                c[0], c[1] = -c[1], c[0]
+                minx = min(minx, c[0])
+                miny = min(miny, c[1])
+            for c in self.coords:
+                c[0] -= minx
+                c[1] -= miny
 
 pieces = [
     Piece([[0, 0], [1, 0], [1, 1], [2, 0]], Color.GREEN),  # T
@@ -75,11 +76,11 @@ class Tetris:
         """Rotate the current piece in CCW direction."""
         if self.current:
             self.current.rotate()
-            # TODO block rotation if the result is illegal
             # Ensure piece stays within grid
             shift = self.cols - (self.current_pos[1] + self.current.width())
             if shift < 0:
                 self.current_pos[1] += shift
+            # TODO: undo block rotation if the result is illegal
     
     def left(self):
         """Shift the current piece to the left, if possible."""
