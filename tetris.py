@@ -217,5 +217,5 @@ class Tetris:
             if self.is_cleared():
                 row_score += 100
             self.score += row_score * self.speed
-            print(f'+{row_score}@{self.speed} => {self.score}')
+            print(f'+{row_score}@{self.speed:.1f} => {self.score:.0f}')
             for l in self.listeners: l.cleared(rows)
