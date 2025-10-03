@@ -1,6 +1,31 @@
 import pygame
 from tetris import *
 
+def to_pg_color(cell):
+    return pygame.Color(cell.name.lower()) if cell != Color.EMPTY else pygame.Color('black')
+
+
+class TetrisGrid(pygame.sprite.Sprite):
+    def __init__(self, rows, cols, cell_size):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([cols*cell_size, rows*cell_size])
+        self.rect = self.image.get_rect()
+        self.cell_size = cell_size
+    
+    def cell2rect(self, row, col):
+        return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
+
+    def update(self, tetris):
+        for r in range(tetris.rows):
+            for c in range(tetris.cols):
+                cell = tetris.grid[r][c]
+                color = to_pg_color(cell)
+                # Draw cell and grey frame
+                pygame.draw.rect(self.image, color, self.cell2rect(r, c))
+                pygame.draw.rect(self.image, pygame.Color('grey'), self.cell2rect(r, c), 1)
+
+
+
 
 class TetrisPygame:
     """A pygame based renderer for a tetris game."""
@@ -12,6 +37,11 @@ class TetrisPygame:
         self.height = tetris.rows * cell_size
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tetris")
+
+        self.grid = TetrisGrid(tetris.rows, tetris.cols, cell_size)
+        self.sprites = pygame.sprite.Group()
+        self.sprites.add(self.grid)
+
         self.clock = pygame.time.Clock()
 
         pygame.mixer.init()
@@ -46,9 +76,6 @@ class TetrisPygame:
     def stepped(self):
         self.sound_step.play()
     
-    def color(self, cell):
-        return pygame.Color(cell.name.lower()) if cell != Color.EMPTY else pygame.Color('black')
-    
     def cell2rect(self, row, col):
         return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
 
@@ -64,7 +91,7 @@ class TetrisPygame:
     def draw_piece(self):
         if self.tetris.current:
             for r, c in self.tetris.current_coords():
-                color = self.color(self.tetris.current.color)
+                color = to_pg_color(self.tetris.current.color)
                 pygame.draw.rect(self.screen, color, self.cell2rect(r, c))
 
     def run(self):
@@ -88,8 +115,12 @@ class TetrisPygame:
                         self.tetris.down()
                     elif event.key == pygame.K_UP:
                         self.tetris.rotate()
+            
+            self.sprites.update(self.tetris)
+
             self.screen.fill((0, 0, 0))
-            self.draw_grid()
+            self.sprites.draw(self.screen)
+
             self.draw_piece()
             pygame.display.flip()
         pygame.quit()
