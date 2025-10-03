@@ -15,12 +15,12 @@ class TetrisPygame:
         self.clock = pygame.time.Clock()
 
         pygame.mixer.init()
-        self.sound_rotate = pygame.mixer.Sound('sounds/rotate.wav')
+        self.sound_shift = pygame.mixer.Sound('sounds/rotate.wav')
         self.sound_drop = pygame.mixer.Sound('sounds/drop.wav')
         self.sound_cleared = pygame.mixer.Sound('sounds/cleared.wav')
         self.sound_ended = pygame.mixer.Sound('sounds/ended.wav')
         self.sound_step = pygame.mixer.Sound('sounds/step.wav')
-        self.sound_shift = pygame.mixer.Sound('sounds/shift.wav')
+        self.sound_rotate = pygame.mixer.Sound('sounds/shift.wav')
         self.sound_shift_blocked = pygame.mixer.Sound('sounds/shift_blocked.wav')
 
 
@@ -57,6 +57,7 @@ class TetrisPygame:
             for c in range(self.tetris.cols):
                 cell = self.tetris.grid[r][c]
                 color = self.color(cell)
+                # Draw cell and grey frame
                 pygame.draw.rect(self.screen, color, self.cell2rect(r, c))
                 pygame.draw.rect(self.screen, pygame.Color('grey'), self.cell2rect(r, c), 1)
 

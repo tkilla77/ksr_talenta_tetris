@@ -135,7 +135,7 @@ class Tetris:
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
             if self.is_impossible():
                 for l in self.listeners: l.ended(self.score)
-                raise Exception(f"ended with highscore {self.score}")
+                raise Exception(f"ended with highscore {round(self.score)}")
             else:
                 for l in self.listeners: l.spawned()
 
@@ -153,6 +153,7 @@ class Tetris:
         """Anchors the current piece in place by fixing the cells, and clears the current piece."""
         for r, c in self.current_coords():
             self.grid[r][c] = self.current.color
+            self.score += 1 * self.speed
         self.current = None
         self.current_pos = None
 
@@ -215,6 +216,6 @@ class Tetris:
         if row_score:
             if self.is_cleared():
                 row_score += 100
-            self.score += row_score
-            print(f'+{row_score} => {self.score}')
+            self.score += row_score * self.speed
+            print(f'+{row_score}@{self.speed} => {self.score}')
             for l in self.listeners: l.cleared(rows)
