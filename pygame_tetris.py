@@ -13,27 +13,38 @@ class TetrisPygame:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tetris")
         self.clock = pygame.time.Clock()
+
+        pygame.mixer.init()
+        self.sound_rotate = pygame.mixer.Sound('sounds/rotate.wav')
+        self.sound_drop = pygame.mixer.Sound('sounds/drop.wav')
+        self.sound_cleared = pygame.mixer.Sound('sounds/cleared.wav')
+        self.sound_ended = pygame.mixer.Sound('sounds/ended.wav')
+        self.sound_step = pygame.mixer.Sound('sounds/step.wav')
+        self.sound_shift = pygame.mixer.Sound('sounds/shift.wav')
+        self.sound_shift_blocked = pygame.mixer.Sound('sounds/shift_blocked.wav')
+
+
         tetris.add_listener(self)
 
     # Tetris Event listeners
     def rotated(self):
-        pass
+        self.sound_rotate.play()
     def shifted(self):
-        pass
+        self.sound_shift.play()
     def shift_blocked(self):
-        pass
+        self.sound_shift_blocked.play()
     def lowered(self):
-        pass
+        self.sound_drop.play()
     def ended(self, score):
-        pass
+        self.sound_ended.play()
     def spawned(self):
-        pass
+        self.sound_step.play()
     def anchored(self):
         pass
     def cleared(self, rows):
-        pass
+        self.sound_cleared.play()
     def stepped(self):
-        pass
+        self.sound_step.play()
     
     def color(self, cell):
         return pygame.Color(cell.name.lower()) if cell != Color.EMPTY else pygame.Color('black')

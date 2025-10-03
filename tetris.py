@@ -91,7 +91,7 @@ class Tetris:
     def left(self):
         """Shift the current piece to the left, if possible."""
         if self.current_pos:
-            self.current_pos[1] = max(0, self.current_pos[1] - 1)
+            self.current_pos[1] = self.current_pos[1] - 1
             if self.is_impossible():
                 self.current_pos[1] += 1
                 for l in self.listeners: l.shift_blocked()
@@ -101,7 +101,7 @@ class Tetris:
     def right(self):
         """Shift the current piece to the right, if possible."""
         if self.current:
-            self.current_pos[1] = min(self.cols - self.current.width(), self.current_pos[1] + 1)
+            self.current_pos[1] = self.current_pos[1] + 1
             if self.is_impossible():
                 self.current_pos[1] -= 1
                 for l in self.listeners: l.shift_blocked()
@@ -160,6 +160,10 @@ class Tetris:
         """Returns True if the current piece position is illegal."""
         if self.current:
             for r, c in self.current_coords():
+                if not (0 <= c < self.cols):
+                    return True
+                if not (0 <= r < self.rows):
+                    return True
                 if self.grid[r][c] != Color.EMPTY:
                     return True  # piece overlaps with an existing block.
         return False
