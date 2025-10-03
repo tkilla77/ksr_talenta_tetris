@@ -57,7 +57,7 @@ def random_piece():
     """Returns a random piece."""
     import copy
     return copy.deepcopy(random.choice(pieces))
-    # return copy.deepcopy(pieces[1])  # for testing
+    # return copy.deepcopy(pieces[1])  # only I-bars for testing
     
 class Tetris:
     """An abstract game of Tetris."""
@@ -72,6 +72,10 @@ class Tetris:
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
         self.current_pos = None
+        self.listeners = []
+    
+    def add_listener(self, callback):
+        self.listeners.append(callback)
     
     def rotate(self):
         """Rotate the current piece in CCW direction."""
@@ -82,6 +86,7 @@ class Tetris:
             if shift < 0:
                 self.current_pos[1] += shift
             # TODO: undo block rotation if the result is illegal
+            for l in self.listeners: l.rotated()
     
     def left(self):
         """Shift the current piece to the left, if possible."""
@@ -89,6 +94,9 @@ class Tetris:
             self.current_pos[1] = max(0, self.current_pos[1] - 1)
             if self.is_impossible():
                 self.current_pos[1] += 1
+                for l in self.listeners: l.shift_blocked()
+            else:
+                for l in self.listeners: l.shifted()
 
     def right(self):
         """Shift the current piece to the right, if possible."""
@@ -96,13 +104,17 @@ class Tetris:
             self.current_pos[1] = min(self.cols - self.current.width(), self.current_pos[1] + 1)
             if self.is_impossible():
                 self.current_pos[1] -= 1
+                for l in self.listeners: l.shift_blocked()
+            else:
+                for l in self.listeners: l.shifted()
 
     def down(self):
         """Shift the current piece down as far as possible."""
         if self.current:
             while not self.is_blocked():
                 self.current_pos[0] += 1
-    
+            for l in self.listeners: l.lowered()
+
     def current_coords(self):
         """Returns the coordinates [row, col] of all cells occupied by the current piece."""
         result = []
@@ -122,14 +134,20 @@ class Tetris:
             self.current = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
             if self.is_impossible():
+                for l in self.listeners: l.ended(self.score)
                 raise Exception(f"ended with highscore {self.score}")
+            else:
+                for l in self.listeners: l.spawned()
+
         elif self.is_blocked():
             # Anchor the current piece and clear rows.
             self.anchor_piece()
             self.clear_full_rows()
+            for l in self.listeners: l.anchored()
         else:
             # Lower current piece by one.
             self.current_pos[0] += 1
+            for l in self.listeners: l.stepped()
     
     def anchor_piece(self):
         """Anchors the current piece in place by fixing the cells, and clears the current piece."""
@@ -185,11 +203,14 @@ class Tetris:
     def clear_full_rows(self):
         """Clear all complete rows."""
         row_score = 0
+        rows = 0
         while self.clear_full_row():
             # Clearing multiple rows increases the jackpot...
             row_score = row_score * 2 + self.cols
+            rows += 1
         if row_score:
             if self.is_cleared():
                 row_score += 100
             self.score += row_score
             print(f'+{row_score} => {self.score}')
+            for l in self.listeners: l.cleared(rows)

@@ -1,6 +1,7 @@
 import pygame
 from tetris import *
 
+
 class TetrisPygame:
     """A pygame based renderer for a tetris game."""
     def __init__(self, tetris, cell_size=30):
@@ -12,6 +13,27 @@ class TetrisPygame:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tetris")
         self.clock = pygame.time.Clock()
+        tetris.add_listener(self)
+
+    # Tetris Event listeners
+    def rotated(self):
+        pass
+    def shifted(self):
+        pass
+    def shift_blocked(self):
+        pass
+    def lowered(self):
+        pass
+    def ended(self, score):
+        pass
+    def spawned(self):
+        pass
+    def anchored(self):
+        pass
+    def cleared(self, rows):
+        pass
+    def stepped(self):
+        pass
     
     def color(self, cell):
         return pygame.Color(cell.name.lower()) if cell != Color.EMPTY else pygame.Color('black')
