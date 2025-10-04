@@ -46,6 +46,7 @@ class Tetromino(pygame.sprite.Sprite):
                 pygame.draw.rect(self.image, color, self.cell2rect(r, c))
 
 class TetrisGameArea(pygame.sprite.Group):
+    """A custom sprite group for the grid and current tetromino."""
     def __init__(self, tetris, cell_size):
         pygame.sprite.Group.__init__(self)
         self.grid = TetrisGrid(tetris.rows, tetris.cols, cell_size)
