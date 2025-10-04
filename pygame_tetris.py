@@ -57,7 +57,7 @@ class TetrisGameArea(pygame.sprite.Group):
         self.add(self.tetromino)
 
     def draw(self, surface: pygame.Surface, bgd=None, special_flags=0):
-        surface.blit(self.grid.image)  # TODO add destination
+        surface.blit(self.grid.image)
         if self.tetris.current:                
             dest = (self.tetris.current_pos[1]*self.cell_size, self.tetris.current_pos[0]*self.cell_size)
             surface.blit(self.tetromino.image, dest=dest)
@@ -66,10 +66,7 @@ class TetrisPygame:
     """A pygame based renderer for a tetris game."""
     def __init__(self, tetris, cell_size=30):
         pygame.init()
-        self.cell_size = cell_size
         self.tetris = tetris
-        self.width = tetris.cols * cell_size
-        self.height = tetris.rows * cell_size
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tetris")
 
@@ -131,7 +128,6 @@ class TetrisPygame:
                     elif event.key == pygame.K_UP:
                         self.tetris.rotate()
 
-            # FIXME: draw Tetromino at correct location            
             self.sprites.update(self.tetris)
 
             self.screen.fill((0, 0, 0))
