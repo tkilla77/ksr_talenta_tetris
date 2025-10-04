@@ -6,11 +6,13 @@ def to_pg_color(cell):
 
 
 class TetrisGrid(pygame.sprite.Sprite):
+    """A sprite for the main grid."""
     def __init__(self, rows, cols, cell_size):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([cols*cell_size, rows*cell_size])
         self.rect = self.image.get_rect()
         self.cell_size = cell_size
+        self.layer = 0
     
     def cell2rect(self, row, col):
         return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
@@ -24,9 +26,41 @@ class TetrisGrid(pygame.sprite.Sprite):
                 pygame.draw.rect(self.image, color, self.cell2rect(r, c))
                 pygame.draw.rect(self.image, pygame.Color('grey'), self.cell2rect(r, c), 1)
 
+class Tetromino(pygame.sprite.Sprite):
+    """A sprite for the currently active piece."""
+    def __init__(self, cell_size):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([4*cell_size, 4*cell_size]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.cell_size = cell_size
+        self.layer = 1
 
+    def cell2rect(self, row, col):
+        return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
 
+    def update(self, tetris):
+        if tetris.current:
+            self.image.fill((0, 0, 0, 0))
+            for r, c in tetris.current.coords:
+                color = to_pg_color(tetris.current.color)
+                pygame.draw.rect(self.image, color, self.cell2rect(r, c))
 
+class TetrisGameArea(pygame.sprite.Group):
+    def __init__(self, tetris, cell_size):
+        pygame.sprite.Group.__init__(self)
+        self.grid = TetrisGrid(tetris.rows, tetris.cols, cell_size)
+        self.tetris = tetris
+        self.cell_size = cell_size
+        self.tetromino = Tetromino(cell_size)
+        self.add(self.grid)
+        self.add(self.tetromino)
+
+    def draw(self, surface: pygame.Surface, bgd=None, special_flags=0):
+        surface.blit(self.grid.image)  # TODO add destination
+        if self.tetris.current:                
+            dest = (self.tetris.current_pos[1]*self.cell_size, self.tetris.current_pos[0]*self.cell_size)
+            surface.blit(self.tetromino.image, dest=dest)
+    
 class TetrisPygame:
     """A pygame based renderer for a tetris game."""
     def __init__(self, tetris, cell_size=30):
@@ -38,9 +72,7 @@ class TetrisPygame:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tetris")
 
-        self.grid = TetrisGrid(tetris.rows, tetris.cols, cell_size)
-        self.sprites = pygame.sprite.Group()
-        self.sprites.add(self.grid)
+        self.sprites = TetrisGameArea(tetris, cell_size)
 
         self.clock = pygame.time.Clock()
 
@@ -76,24 +108,6 @@ class TetrisPygame:
     def stepped(self):
         self.sound_step.play()
     
-    def cell2rect(self, row, col):
-        return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
-
-    def draw_grid(self):
-        for r in range(self.tetris.rows):
-            for c in range(self.tetris.cols):
-                cell = self.tetris.grid[r][c]
-                color = self.color(cell)
-                # Draw cell and grey frame
-                pygame.draw.rect(self.screen, color, self.cell2rect(r, c))
-                pygame.draw.rect(self.screen, pygame.Color('grey'), self.cell2rect(r, c), 1)
-
-    def draw_piece(self):
-        if self.tetris.current:
-            for r, c in self.tetris.current_coords():
-                color = to_pg_color(self.tetris.current.color)
-                pygame.draw.rect(self.screen, color, self.cell2rect(r, c))
-
     def run(self):
         running = True
         step_time = 0
@@ -115,13 +129,13 @@ class TetrisPygame:
                         self.tetris.down()
                     elif event.key == pygame.K_UP:
                         self.tetris.rotate()
-            
+
+            # FIXME: draw Tetromino at correct location            
             self.sprites.update(self.tetris)
 
             self.screen.fill((0, 0, 0))
             self.sprites.draw(self.screen)
 
-            self.draw_piece()
             pygame.display.flip()
         pygame.quit()
 
