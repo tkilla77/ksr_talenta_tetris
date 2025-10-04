@@ -40,7 +40,7 @@ class Tetromino(pygame.sprite.Sprite):
 
     def update(self, tetris):
         if tetris.current:
-            self.image.fill((0, 0, 0, 0))
+            self.image.fill((0, 0, 0, 0))  # fill with transparency
             for r, c in tetris.current.coords:
                 color = to_pg_color(tetris.current.color)
                 pygame.draw.rect(self.image, color, self.cell2rect(r, c))
@@ -55,6 +55,9 @@ class TetrisGameArea(pygame.sprite.Group):
         self.tetromino = Tetromino(cell_size)
         self.add(self.grid)
         self.add(self.tetromino)
+    
+    def rect(self):
+        return self.grid.rect
 
     def draw(self, surface: pygame.Surface, bgd=None, special_flags=0):
         surface.blit(self.grid.image)
@@ -99,10 +102,10 @@ class TetrisPygame:
     def __init__(self, tetris, cell_size=30):
         pygame.init()
         self.tetris = tetris
-        self.screen = pygame.display.set_mode((tetris.cols * cell_size, tetris.rows * cell_size))
+        self.screen = pygame.display.set_mode(flags=pygame.FULLSCREEN)
         pygame.display.set_caption("Tetris")
 
-        self.sprites = TetrisGameArea(tetris, cell_size)
+        self.game_area = TetrisGameArea(tetris, cell_size)
         self.sounds = TetrisSounds(tetris)
 
         self.clock = pygame.time.Clock()
@@ -132,11 +135,15 @@ class TetrisPygame:
                 step_time = 0
             
             running = self.handle_events()
-            self.sprites.update(self.tetris)
+            self.game_area.update(self.tetris)
             self.screen.fill((0, 0, 0))
-            self.sprites.draw(self.screen)
+            screen_rect = self.screen.get_rect()
+            game_rect = self.game_area.rect().copy()
+            game_rect.center = screen_rect.center
+            game_surface = self.screen.subsurface(game_rect)
+            self.game_area.draw(game_surface)
             pygame.display.flip()
-            
+
         pygame.quit()
 
 if __name__ == "__main__":
