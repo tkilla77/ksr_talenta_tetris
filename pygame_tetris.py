@@ -142,6 +142,12 @@ class TetrisPygame:
             game_rect.center = screen_rect.center
             game_surface = self.screen.subsurface(game_rect)
             self.game_area.draw(game_surface)
+
+            font = pygame.font.SysFont(["Courier", "Monospace"], 100)
+            score_surface = font.render(str(round(self.tetris.score)), antialias=True, color=pygame.Color("yellow"))
+            dest = (game_rect.right + 50, game_rect.top)
+            self.screen.blit(score_surface, dest=dest)
+
             pygame.display.flip()
 
         pygame.quit()
