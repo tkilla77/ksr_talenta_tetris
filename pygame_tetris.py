@@ -61,19 +61,9 @@ class TetrisGameArea(pygame.sprite.Group):
         if self.tetris.current:                
             dest = (self.tetris.current_pos[1]*self.cell_size, self.tetris.current_pos[0]*self.cell_size)
             surface.blit(self.tetromino.image, dest=dest)
-    
-class TetrisPygame:
-    """A pygame based renderer for a tetris game."""
-    def __init__(self, tetris, cell_size=30):
-        pygame.init()
-        self.tetris = tetris
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Tetris")
 
-        self.sprites = TetrisGameArea(tetris, cell_size)
-
-        self.clock = pygame.time.Clock()
-
+class TetrisSounds():
+    def __init__(self, tetris):
         pygame.mixer.init()
         self.sound_shift = pygame.mixer.Sound('sounds/rotate.wav')
         self.sound_drop = pygame.mixer.Sound('sounds/drop.wav')
@@ -83,10 +73,8 @@ class TetrisPygame:
         self.sound_rotate = pygame.mixer.Sound('sounds/shift.wav')
         self.sound_shift_blocked = pygame.mixer.Sound('sounds/shift_blocked.wav')
 
-
         tetris.add_listener(self)
 
-    # Tetris Event listeners
     def rotated(self):
         self.sound_rotate.play()
     def shifted(self):
@@ -106,6 +94,34 @@ class TetrisPygame:
     def stepped(self):
         self.sound_step.play()
     
+class TetrisPygame:
+    """A pygame based renderer for a tetris game."""
+    def __init__(self, tetris, cell_size=30):
+        pygame.init()
+        self.tetris = tetris
+        self.screen = pygame.display.set_mode((tetris.cols * cell_size, tetris.rows * cell_size))
+        pygame.display.set_caption("Tetris")
+
+        self.sprites = TetrisGameArea(tetris, cell_size)
+        self.sounds = TetrisSounds(tetris)
+
+        self.clock = pygame.time.Clock()
+   
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.tetris.left()
+                elif event.key == pygame.K_RIGHT:
+                    self.tetris.right()
+                elif event.key == pygame.K_DOWN:
+                    self.tetris.down()
+                elif event.key == pygame.K_UP:
+                    self.tetris.rotate()
+        return True
+
     def run(self):
         running = True
         step_time = 0
@@ -114,29 +130,16 @@ class TetrisPygame:
             if step_time > 1000 / self.tetris.speed:
                 self.tetris.step()
                 step_time = 0
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        self.tetris.left()
-                    elif event.key == pygame.K_RIGHT:
-                        self.tetris.right()
-                    elif event.key == pygame.K_DOWN:
-                        self.tetris.down()
-                    elif event.key == pygame.K_UP:
-                        self.tetris.rotate()
-
+            
+            running = self.handle_events()
             self.sprites.update(self.tetris)
-
             self.screen.fill((0, 0, 0))
             self.sprites.draw(self.screen)
-
             pygame.display.flip()
+            
         pygame.quit()
 
 if __name__ == "__main__":
-    tetris = Tetris(20, 10)
+    tetris = Tetris(22, 10)
     game = TetrisPygame(tetris)
     game.run()
