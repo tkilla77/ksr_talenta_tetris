@@ -67,7 +67,7 @@ class Tetris:
         self.grid = [[Color.EMPTY] * cols for _ in range(rows)]
         self.speed = speed  # Game steps per second
         self.speedup = speedup
-        self.score = 0
+        self.score = 0.
         """The currently active piece being dropped."""
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
@@ -217,5 +217,4 @@ class Tetris:
             if self.is_cleared():
                 row_score += 100
             self.score += row_score * self.speed
-            print(f'+{row_score}@{self.speed:.1f} => {self.score:.0f}')
             for l in self.listeners: l.cleared(rows)

@@ -143,10 +143,19 @@ class TetrisPygame:
             game_surface = self.screen.subsurface(game_rect)
             self.game_area.draw(game_surface)
 
-            font = pygame.font.SysFont(["Courier", "Monospace"], 100)
-            score_surface = font.render(str(round(self.tetris.score)), antialias=True, color=pygame.Color("yellow"))
+            caption_font = pygame.font.SysFont(["Courier", "Monospace"], 70)
+            score_font = pygame.font.SysFont(["Courier", "Monospace"], 100)
+            caption_surface = caption_font.render('Score', antialias=True, color=pygame.Color("yellow"))
+            score_surface = score_font.render(f'{round(self.tetris.score)}', antialias=True, color=pygame.Color("yellow"))
             dest = (game_rect.right + 50, game_rect.top)
-            self.screen.blit(score_surface, dest=dest)
+            rect = self.screen.blit(caption_surface, dest=dest)
+            rect = self.screen.blit(score_surface, dest=rect.bottomleft)
+
+            caption_surface = caption_font.render('Speed', antialias=True, color=pygame.Color("yellow"))
+            score_surface = score_font.render(f'{self.tetris.speed:.1f}', antialias=True, color=pygame.Color("yellow"))
+            dest = (game_rect.right + 50, game_rect.top+200)
+            rect = self.screen.blit(caption_surface, dest=rect.bottomleft)
+            rect = self.screen.blit(score_surface, rect.bottomleft)
 
             pygame.display.flip()
 
