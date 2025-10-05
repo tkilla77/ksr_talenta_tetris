@@ -102,7 +102,7 @@ class TetrisPygame:
     def __init__(self, tetris, cell_size=30):
         pygame.init()
         self.tetris = tetris
-        self.screen = pygame.display.set_mode(flags=pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((1024,768), flags=pygame.FULLSCREEN|pygame.SCALED)
         pygame.display.set_caption("Tetris")
 
         self.game_area = TetrisGameArea(tetris, cell_size)
@@ -123,6 +123,8 @@ class TetrisPygame:
                     self.tetris.down()
                 elif event.key == pygame.K_UP:
                     self.tetris.rotate()
+                elif event.key == pygame.K_f:
+                    pygame.display.toggle_fullscreen()
         return True
 
     def run(self):
@@ -143,8 +145,8 @@ class TetrisPygame:
             game_surface = self.screen.subsurface(game_rect)
             self.game_area.draw(game_surface)
 
-            caption_font = pygame.font.SysFont(["Courier", "Monospace"], 70)
-            score_font = pygame.font.SysFont(["Courier", "Monospace"], 100)
+            caption_font = pygame.font.SysFont("", 70)
+            score_font = pygame.font.SysFont("", 100)
             caption_surface = caption_font.render('Score', antialias=True, color=pygame.Color("yellow"))
             score_surface = score_font.render(f'{round(self.tetris.score)}', antialias=True, color=pygame.Color("yellow"))
             dest = (game_rect.right + 50, game_rect.top)
