@@ -72,6 +72,8 @@ class Tetris:
         self.current = None
         """The upper-left coordinate [row, col] of the current piece being dropped."""
         self.current_pos = None
+        """The next piece to appear."""
+        self.next = random_piece()
         self.listeners = []
     
     def add_listener(self, callback):
@@ -131,7 +133,8 @@ class Tetris:
            spawning a fresh piece."""
         if not self.current:
             # Spawn a new piece
-            self.current = random_piece()
+            self.current = self.next
+            self.next = random_piece()
             self.current_pos = [0, (self.cols - self.current.width()) // 2]
             if self.is_impossible():
                 for l in self.listeners: l.ended(self.score)

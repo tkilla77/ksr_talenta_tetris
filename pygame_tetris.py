@@ -37,13 +37,23 @@ class Tetromino(pygame.sprite.Sprite):
 
     def cell2rect(self, row, col):
         return (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
+    
+    def update_piece(self, piece):
+        if piece:
+            self.image.fill((0, 0, 0, 0))  # fill with transparency
+            for r, c in piece.coords:
+                color = to_pg_color(piece.color)
+                pygame.draw.rect(self.image, color, self.cell2rect(r, c))
 
     def update(self, tetris):
-        if tetris.current:
-            self.image.fill((0, 0, 0, 0))  # fill with transparency
-            for r, c in tetris.current.coords:
-                color = to_pg_color(tetris.current.color)
-                pygame.draw.rect(self.image, color, self.cell2rect(r, c))
+        self.update_piece(tetris.current)
+
+class NextTetromino(Tetromino):
+    def __init__(self, cell_size):
+        Tetromino.__init__(self, cell_size)
+    
+    def update(self, tetris):
+        self.update_piece(tetris.next)
 
 class TetrisGameArea(pygame.sprite.Group):
     """A custom sprite group for the grid and current tetromino."""
@@ -102,10 +112,13 @@ class TetrisPygame:
     def __init__(self, tetris, cell_size=30):
         pygame.init()
         self.tetris = tetris
-        self.screen = pygame.display.set_mode((1024,768), flags=pygame.FULLSCREEN|pygame.SCALED)
+        screen_sizes = pygame.display.get_desktop_sizes()
+        initial_size = screen_sizes[0] if screen_sizes else (1024, 768)
+        self.screen = pygame.display.set_mode(initial_size, flags=pygame.RESIZABLE)
         pygame.display.set_caption("Tetris")
 
         self.game_area = TetrisGameArea(tetris, cell_size)
+        self.next_piece = NextTetromino(cell_size)
         self.sounds = TetrisSounds(tetris)
 
         self.clock = pygame.time.Clock()
@@ -138,6 +151,7 @@ class TetrisPygame:
             
             running = self.handle_events()
             self.game_area.update(self.tetris)
+            self.next_piece.update(self.tetris)
             self.screen.fill((0, 0, 0))
             screen_rect = self.screen.get_rect()
             game_rect = self.game_area.rect().copy()
@@ -147,17 +161,21 @@ class TetrisPygame:
 
             caption_font = pygame.font.SysFont("", 70)
             score_font = pygame.font.SysFont("", 100)
-            caption_surface = caption_font.render('Score', antialias=True, color=pygame.Color("yellow"))
-            score_surface = score_font.render(f'{round(self.tetris.score)}', antialias=True, color=pygame.Color("yellow"))
+
+            caption_surface = caption_font.render('Next', antialias=True, color=pygame.Color("yellow"))
             dest = (game_rect.right + 50, game_rect.top)
             rect = self.screen.blit(caption_surface, dest=dest)
+            rect = self.screen.blit(self.next_piece.image, dest=rect.bottomleft)
+
+            caption_surface = caption_font.render('Score', antialias=True, color=pygame.Color("yellow"))
+            score_surface = score_font.render(f'{round(self.tetris.score)}', antialias=True, color=pygame.Color("yellow"))
+            rect = self.screen.blit(caption_surface, dest=rect.bottomleft)
             rect = self.screen.blit(score_surface, dest=rect.bottomleft)
 
             caption_surface = caption_font.render('Speed', antialias=True, color=pygame.Color("yellow"))
             score_surface = score_font.render(f'{self.tetris.speed:.1f}', antialias=True, color=pygame.Color("yellow"))
-            dest = (game_rect.right + 50, game_rect.top+200)
             rect = self.screen.blit(caption_surface, dest=rect.bottomleft)
-            rect = self.screen.blit(score_surface, rect.bottomleft)
+            rect = self.screen.blit(score_surface, dest=rect.bottomleft)
 
             pygame.display.flip()
 
