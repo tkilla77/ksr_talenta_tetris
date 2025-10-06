@@ -27,7 +27,7 @@ class TetrisGrid(pygame.sprite.Sprite):
                 pygame.draw.rect(self.image, pygame.Color('grey'), self.cell2rect(r, c), 1)
 
 class Tetromino(pygame.sprite.Sprite):
-    """A sprite for the currently active piece."""
+    """A sprite for a Tetris piece."""
     def __init__(self, cell_size):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([4*cell_size, 4*cell_size]).convert_alpha()
@@ -49,10 +49,10 @@ class TetrisGameArea(pygame.sprite.Group):
     """A custom sprite group for the grid and current tetromino."""
     def __init__(self, tetris, cell_size):
         pygame.sprite.Group.__init__(self)
-        self.grid = TetrisGrid(tetris.rows, tetris.cols, cell_size)
-        self.tetris = tetris
         self.cell_size = cell_size
+        self.grid = TetrisGrid(tetris.rows, tetris.cols, cell_size)
         self.tetromino = Tetromino(cell_size)
+        self.destination = None
         self.add(self.grid)
         self.add(self.tetromino)
     
@@ -62,12 +62,15 @@ class TetrisGameArea(pygame.sprite.Group):
     def update(self, tetris):
         self.grid.update(tetris)
         self.tetromino.update(tetris.current)
+        if tetris.current:
+            self.destination = (tetris.current_pos[1]*self.cell_size, tetris.current_pos[0]*self.cell_size)
+        else:
+            self.destination = None
 
     def draw(self, surface: pygame.Surface, bgd=None, special_flags=0):
         surface.blit(self.grid.image)
-        if self.tetris.current:                
-            dest = (self.tetris.current_pos[1]*self.cell_size, self.tetris.current_pos[0]*self.cell_size)
-            surface.blit(self.tetromino.image, dest=dest)
+        if self.destination:
+            surface.blit(self.tetromino.image, dest=self.destination)
 
 class TetrisSounds():
     def __init__(self, tetris):
@@ -144,8 +147,10 @@ class TetrisPygame:
                 step_time = 0
             
             running = self.handle_events()
+
             self.game_area.update(self.tetris)
             self.next_piece.update(self.tetris.next)
+
             self.screen.fill((0, 0, 0))
             screen_rect = self.screen.get_rect()
             game_rect = self.game_area.rect().copy()
