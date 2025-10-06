@@ -128,25 +128,28 @@ class Tetris:
             result.append([r, c])
         return result
 
+    def spawn(self):
+        # Spawn a new piece
+        self.current = self.next
+        self.next = random_piece()
+        self.current_pos = [0, (self.cols - self.current.width()) // 2]
+        if self.is_impossible():
+            for l in self.listeners: l.ended(self.score)
+            raise Exception(f"ended with highscore {round(self.score)}")
+        else:
+            for l in self.listeners: l.spawned()
+
     def step(self):
         """Modifies the state of the tetris game by dropping the current piece by one, or 
            spawning a fresh piece."""
         if not self.current:
-            # Spawn a new piece
-            self.current = self.next
-            self.next = random_piece()
-            self.current_pos = [0, (self.cols - self.current.width()) // 2]
-            if self.is_impossible():
-                for l in self.listeners: l.ended(self.score)
-                raise Exception(f"ended with highscore {round(self.score)}")
-            else:
-                for l in self.listeners: l.spawned()
-
+            self.spawn()
         elif self.is_blocked():
             # Anchor the current piece and clear rows.
             self.anchor_piece()
             self.clear_full_rows()
             for l in self.listeners: l.anchored()
+            self.spawn()
         else:
             # Lower current piece by one.
             self.current_pos[0] += 1
