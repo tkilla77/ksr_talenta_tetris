@@ -169,6 +169,8 @@ class TetrisSounds():
 
     def rotated(self):
         self.sound_rotate.play()
+    def rotate_blocked(self):
+        self.sound_shift_blocked.play()
     def shifted(self):
         self.sound_shift.play()
     def shift_blocked(self):

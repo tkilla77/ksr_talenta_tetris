@@ -1,5 +1,6 @@
 from enum import Enum
 import random
+import copy
 
 class Color(Enum):
     EMPTY = 1
@@ -55,7 +56,6 @@ pieces = [
 ]
 def random_piece():
     """Returns a random piece."""
-    import copy
     return copy.deepcopy(random.choice(pieces))
     # return copy.deepcopy(pieces[1])  # only I-bars for testing
     
@@ -82,13 +82,17 @@ class Tetris:
     def rotate(self):
         """Rotate the current piece in CCW direction."""
         if self.current:
+            backup = copy.deepcopy(self.current)
             self.current.rotate()
             # Ensure piece stays within grid
             shift = self.cols - (self.current_pos[1] + self.current.width())
             if shift < 0:
                 self.current_pos[1] += shift
-            # TODO: undo block rotation if the result is illegal
-            for l in self.listeners: l.rotated()
+            if self.is_impossible():
+                self.current = backup
+                for l in self.listeners: l.rotate_blocked()
+            else:
+                for l in self.listeners: l.rotated()
     
     def left(self):
         """Shift the current piece to the left, if possible."""
